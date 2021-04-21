@@ -1,0 +1,35 @@
+# This document is a template with all the available configuration parameters
+
+# Configuration for the station
+
+[station]
+name = "SRAM Station"
+host = "127.0.0.1"
+port = "5000"
+secret_key = 'secret_key'
+baudrate = 350_000
+
+# Configuration for the databases
+
+[databases]
+
+[databases.mongo]
+host = "localhost"
+port = "27017"
+name = "SRAM"
+
+[databases.sqlite]
+file = "./samples.db"
+
+# Database to store the user tokens
+[databases.users]
+file = "./users.db"
+
+# Configuration for the databases
+
+[loggers]
+
+[loggers.influx]
+host = "127.0.0.1"
+port = "8086"
+name = "station"
