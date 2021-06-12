@@ -1,16 +1,16 @@
 # This document is a template with all the available configuration parameters
 
 # Configuration for the station
-
 [station]
 name = "SRAM Station"
 host = "127.0.0.1"
 port = "5000"
 secret_key = 'secret_key'
-baudrate = 350_000
+baudrate = { "USB0" = 350_000, "USB0" = 125_000 }
+lower_bound = 6
+higher_bound = 6
 
 # Configuration for the databases
-
 [databases]
 
 [databases.mongo]
@@ -19,14 +19,9 @@ port = "27017"
 name = "SRAM"
 
 [databases.sqlite]
-file = "./samples.db"
+file = "/path/to/samples.db"
 
-# Database to store the user tokens
-[databases.users]
-file = "./users.db"
-
-# Configuration for the databases
-
+# Configuration for the loggers
 [loggers]
 
 [loggers.influx]

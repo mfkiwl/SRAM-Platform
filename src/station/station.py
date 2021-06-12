@@ -97,11 +97,7 @@ class Station:
         Return:
           Dict
         """
-        return {
-                "uptime": self.__uptime,
-                "ports": self.ports,
-                "devices": self.devices
-                }
+        return {"uptime": self.__uptime, "ports": self.ports, "devices": self.devices}
 
     def cmd_ping(self, config: dict) -> Sample:
         """"""
@@ -138,7 +134,7 @@ class Station:
         )
         # self._dev_manager.send(packet)
         # response = self._dev_manager.receive()
-        response = self._dev_manager.transmit(packet)
+        response = self._dev_manager.transmit(packet, timeout=4)
         return response.__dict__() if response else None
 
     def cmd_write(self, config: dict) -> dict:
@@ -152,7 +148,7 @@ class Station:
         )
         # self._dev_manager.send(packet)
         # response = self._dev_manager.receive()
-        response = self._dev_manager.transmit(packet)
+        response = self._dev_manager.transmit(packet, timeout=4)
         return response.__dict__() if response else None
 
     def cmd_sensors(self, config: dict) -> Sample:
@@ -164,7 +160,7 @@ class Station:
         )
         # self._dev_manager.send(packet)
         # response = self._dev_manager.receive()
-        response = self._dev_manager.transmit(packet)
+        response = self._dev_manager.transmit(packet, timeout=4)
         return response.__dict__() if response else None
 
     def ports_power_on(self, ports: Union[str, List[str]] = None):

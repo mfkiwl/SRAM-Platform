@@ -3,7 +3,7 @@ import hashlib
 import struct
 from abc import ABC
 from abc import abstractmethod
-from typing import List
+from typing import List, Dict, Any
 
 
 class Serializable(ABC):
@@ -107,9 +107,12 @@ class Packet(Serializable):
             If the command is WRITE:
                 + Offset of memory to write.
 
-        uid: Hex string representation of a device. Each ID is 24 bytes long plus the null terminator.
+        uid: Hex string representation of a device.
+        Each ID is 24 bytes long plus the null terminator.
 
-        data: Information carried by the packet. Its size is fixed to `DATA_SIZE`.
+        data: Information carried by the packet.
+        Its size is fixed to `DATA_SIZE`.
+
         __bytes: Bytes representation of the packet.
 
     Args:
@@ -178,8 +181,7 @@ class Packet(Serializable):
         Returns:
           Int.
         """
-        ba = bytearray(self.__bytes)
-        return sum(ba) % 0xFFFF
+        return sum(bytearray(self.__bytes)) % 0xFFFF
 
     @classmethod
     def from_bytes(cls, blob: bytes):
@@ -216,9 +218,10 @@ class Packet(Serializable):
         )
 
     def __str__(self) -> str:
-        return f'{_CMD_TO_NAME[self.command]} [{self.options}] 0x{self.checksum} P{self.pic} ({self.data})'
+        return (f"{_CMD_TO_NAME[self.command]} [{self.options}]"
+                f"0x{self.checksum} P{self.pic} ({bytes(self.data)!r})")
 
-    def __dict__(self) -> dict:
+    def __dict__(self):
         doc = {
             "pic": self.pic,
             "device": self.uid,
@@ -230,8 +233,12 @@ class Packet(Serializable):
         if _CMD_TO_NAME.get(self.command, "ERR") in ["SENSORS"]:
             # sensors = doc.update(self.extract_sensors())
             sensors = self.extract_sensors()
-            doc["temperature"] = calc_temp(sensors['temp_raw'], sensors['temp_30_cal'], sensors['temp_110_cal'])
-            doc["voltage"] = calc_vdd(sensors['vdd_raw'], sensors['vdd_cal'])
+            doc["temperature"] = calc_temp(
+                sensors["temp_raw"],
+                sensors["temp_30_cal"],
+                sensors["temp_110_cal"]
+            )
+            doc["voltage"] = calc_vdd(sensors["vdd_raw"], sensors["vdd_cal"])
         if _CMD_TO_NAME.get(self.command, "ERR") in ["ACK", "PING"]:
             doc["sram_size"] = self.options
         return doc
@@ -260,9 +267,11 @@ class Packet(Serializable):
         return self.__bytes
 
     def create_uid(self, port: str = "/dev/ttyUSB0") -> str:
-        """"""
-        m = hashlib.md5()
-        m.update(bytes(self.pic))
-        m.update(bytes(self.uid, "utf-8"))
-        m.update(bytes(port, "utf-8"))
-        return m.hexdigest()
+        """
+        Create a unique md5 hash representing the device
+        """
+        hasher = hashlib.md5()
+        hasher.update(bytes(self.pic))
+        hasher.update(bytes(self.uid, "utf-8"))
+        hasher.update(bytes(port, "utf-8"))
+        return hasher.hexdigest()

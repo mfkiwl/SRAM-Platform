@@ -3,7 +3,6 @@ from marshmallow import fields
 from marshmallow import post_load
 from marshmallow import Schema
 from marshmallow import validate
-
 from packet import Packet
 
 

@@ -31,4 +31,8 @@ class InfluxDB(Logger):
 
     def log(self, metrics: dict):
         points = self.prepare_metrics(metrics)
-        self.__client.write_points([points,])
+        self.__client.write_points(
+            [
+                points,
+            ]
+        )

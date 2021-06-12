@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-from waitress import serve
-
 from api import app
 from api import toml_config
+from waitress import serve
 
 if __name__ == "__main__":
     host = toml_config["station"]["host"]
