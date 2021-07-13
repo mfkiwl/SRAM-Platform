@@ -13,6 +13,7 @@ class StatusMessageSchema(Schema):
     message = fields.String(
         description="Informative message about the process carried out"
     )
+    data = fields.Raw(description="Any possible data")
 
 
 class DeviceReadRequestSchema(Schema):
@@ -25,6 +26,11 @@ class DeviceReadRequestSchema(Schema):
         required=True,
         description="Offset to read from memory",
         validate=validate.Range(min=-1, max=9999),
+    )
+    include = fields.Boolean(
+        required=False,
+        default=False,
+        description="Whether to include the data from the packet",
     )
 
     @post_load
@@ -44,6 +50,7 @@ class DeviceWriteRequestSchema(DeviceReadRequestSchema):
 class PortInfo(Schema):
     port = fields.String(description="Path to the port in use")
     state = fields.String(description="State of the port. Can be either ON or OFF")
+    baudrate = fields.Integer(description="Baudrate of the port")
 
 
 class DeviceInfo(Schema):

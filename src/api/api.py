@@ -198,7 +198,10 @@ class DevicesRead(MethodResource, Resource):
         station.insert_sample(res, config)
         station.metrics_log(metrics)
         message = f"Values read from device {config['device']} at {address}"
-        return {"status": "success", "message": message}
+        if config.get("include", False):
+            return {"status": "success", "message": message, "data": list(res["data"])}
+        else:
+            return {"status": "success", "message": message}
 
 
 @reg_and_doc("/api/devices/write")

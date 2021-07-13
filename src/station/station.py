@@ -83,7 +83,13 @@ class Station:
     def ports(self):
         ports = []
         for port_name, port_info in self._dev_manager.ports.items():
-            ports.append({"port": port_name, "state": port_info["state"]})
+            ports.append(
+                {
+                    "port": port_name,
+                    "state": port_info["state"],
+                    "baudrate": port_info["baudrate"],
+                }
+            )
         return ports
 
     @property
@@ -96,7 +102,6 @@ class Station:
             else:
                 devs.append(dev)
                 uids.append(dev.uid)
-        print(devs)
         return devs
 
     def status(self) -> dict:
