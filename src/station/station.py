@@ -106,11 +106,7 @@ class Station:
         Return:
           Dict
         """
-        return {
-                "uptime": self.__uptime,
-                "ports": self.ports,
-                "devices": self.devices
-                }
+        return {"uptime": self.__uptime, "ports": self.ports, "devices": self.devices}
 
     def cmd_ping(self, config: dict) -> Sample:
         """"""

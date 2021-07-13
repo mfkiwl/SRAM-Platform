@@ -15,23 +15,23 @@ from flask_apispec.views import MethodResource
 from flask_restful import Api
 from flask_restplus import abort
 from flask_restplus import Resource
-from webargs.flaskparser import parser
-from webargs.flaskparser import use_args
-
-from .schemas import DeviceReadRequestSchema
-from .schemas import DevicesResponseSchema
-from .schemas import DeviceWriteRequestSchema
-from .schemas import ErrorResponseSchema
-from .schemas import StationStatusSchema
-from .schemas import StatusMessageSchema
-from .schemas import PortInfo
-from .schemas import DeviceInfo
 from managers import InfluxDB
 from managers import SQLiteDB
 from managers import USBManager
 from packet import off_to_add
 from packet import Packet
 from station import Station
+from webargs.flaskparser import parser
+from webargs.flaskparser import use_args
+
+from .schemas import DeviceInfo
+from .schemas import DeviceReadRequestSchema
+from .schemas import DevicesResponseSchema
+from .schemas import DeviceWriteRequestSchema
+from .schemas import ErrorResponseSchema
+from .schemas import PortInfo
+from .schemas import StationStatusSchema
+from .schemas import StatusMessageSchema
 
 toml_config = toml.load(os.environ["TOML_STATION"])
 
@@ -279,7 +279,7 @@ class DevicesWriteInvert(MethodResource, Resource):
             "tags": {
                 "user": config.get("token", "TIMA"),
                 "device": config["device"],
-                "address": config['address'],
+                "address": config["address"],
             },
         }
         station.metrics_log(metrics)
@@ -292,7 +292,9 @@ class DevicesWriteInvert(MethodResource, Resource):
 
 @reg_and_doc("/api/devices/sensors/<string:device>")
 class DevicesSensors(MethodResource, Resource):
-    @doc(description="Extract the sensor information from the devices", tags=["Devices"])
+    @doc(
+        description="Extract the sensor information from the devices", tags=["Devices"]
+    )
     def get(self, device):
         dev = [d for d in station.devices if d.uid == device]
         if len(dev) < 1:
@@ -301,16 +303,22 @@ class DevicesSensors(MethodResource, Resource):
                 "message": f"Device {device} not found in the list of registered devices",
             }, 400
 
-        packet = station.cmd_sensors({'device': device})
+        packet = station.cmd_sensors({"device": device})
+        if not packet:
+            return {
+                "status": "fail",
+                "message": f"Could not read sensors from device {device}",
+            }, 400
+
         metrics = {
             "measurement": "sensors",
-            'fields': {
-                "temperature": packet['temperature'],
-                "voltage": packet['voltage']
+            "fields": {
+                "temperature": packet["temperature"],
+                "voltage": packet["voltage"],
             },
-            'tags': {
+            "tags": {
                 "device": device,
-                }
+            },
         }
         station.metrics_log(metrics)
         message = "Sensor information extracted from devices"

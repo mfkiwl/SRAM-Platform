@@ -1,0 +1,11 @@
+[Unit]
+Description="Read and write the memory contents of the boards"
+
+[Service]
+Type=oneshot
+User=vinagrero
+WorkingDirectory=/path/to/project
+ExecStart=src/read_write_operation.py
+
+[Install]
+WantedBy=multi-user.target

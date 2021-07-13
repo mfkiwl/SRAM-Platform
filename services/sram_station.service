@@ -1,0 +1,12 @@
+[Unit]
+Description="SRAM Platform to interface with microcontrollers"
+After=network-online.target
+
+[Service]
+Environment="TOML_STATION=/path/to/config.toml"
+WorkingDirectory=/path/to/project
+ExecStart=/usr/bin/python3 src/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

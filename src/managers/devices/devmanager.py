@@ -13,6 +13,10 @@ from serial.tools import list_ports
 
 from packet import Packet
 from packet import Serializable
+from packet import Packet
+from packet import Serializable
+from serial import Serial
+from serial.tools import list_ports
 
 
 class DeviceManager(ABC):
@@ -25,7 +29,7 @@ class DeviceManager(ABC):
         pass
 
     @abstractmethod
-    def receive(self):
+    def transmit(self, packet: Serializable, timeout: float):
         pass
 
     @abstractmethod
@@ -53,7 +57,7 @@ class USBManager(DeviceManager):
     def __init__(self, config: dict) -> None:
         self.__devices = []
         self.__ports = {}
-        self.__baudrate = config["baudrate"]
+        self.__config = config
 
     def send(self, packet: Serializable) -> None:
         """"""
@@ -79,7 +83,9 @@ class USBManager(DeviceManager):
 
         return packets[0] if len(packets) == 1 else packets
 
-    def transmit(self, packet: Serializable, timeout=0.2) -> Union[List[Serializable], Serializable]:
+    def transmit(
+        self, packet: Serializable, timeout=0.2
+    ) -> Union[List[Serializable], Serializable]:
         """"""
         packets = []
         msg = b""
@@ -87,6 +93,7 @@ class USBManager(DeviceManager):
             ser = port_info["serial"]
             ser.flushInput()
             ser.write(packet.to_bytes())
+            ser.flushOutput()
 
             time.sleep(timeout)
 
@@ -130,6 +137,7 @@ class USBManager(DeviceManager):
             ports_paths = Path("/dev").glob("*USB*")
 
         for port in ports_paths:
-            ser = Serial(str(port), self.__baudrate, timeout=0)
+            baudrate = self.__config['baudrate'].get(port.name, 350_000)
+            ser = Serial(str(port), baudrate, timeout=None)
             port_info = {"state": "ON", "serial": ser}
             self.__ports[port.as_posix()] = port_info

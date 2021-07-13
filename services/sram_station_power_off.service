@@ -1,0 +1,13 @@
+[Unit]
+Description="Power off the station"
+
+[Service]
+Type=oneshot
+User=vinagrero
+Environment="TOML_STATION=/path/to/config.toml"
+WorkingDirectory=/path/to/project
+ExecStart=src/power_off_boards.py
+RemainAfterExit=false
+
+[Install]
+WantedBy=multi-user.target

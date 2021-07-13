@@ -1,0 +1,10 @@
+[Unit]
+Description=Power off all ports of the SRAM station
+
+[Timer]
+OnCalendar=Fri *-*-* 18:00:00
+Unit=sram_station_power_off.service
+Persistent=true
+
+[Install]
+WantedBy=timer.target
